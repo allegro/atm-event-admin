@@ -80,6 +80,7 @@ function UsersTable({ rows, onRemove, onActivate }) {
                     <TableRow>
                         <TableCell component="th">Name</TableCell>
                         <TableCell component="th">Email</TableCell>
+                        <TableCell component="th">Type</TableCell>
                         <TableCell component="th">Actions</TableCell>
                         <TableCell component="th" align="right">Active</TableCell>
                     </TableRow>
@@ -91,6 +92,7 @@ function UsersTable({ rows, onRemove, onActivate }) {
                             <TableRow key={user.id}>
                                 <TableCell scope="row">{user.displayName}</TableCell>
                                 <TableCell scope="row">{user.email}</TableCell>
+                                <TableCell scope="row">{user.type}</TableCell>
                                 <TableCell scope="row">
                                     <ComfirmableButton disabled={user.admin} onSubmit={() => onRemove(user)}
                                                        message={`Do you really want to remove ${user.displayName}?`}>
