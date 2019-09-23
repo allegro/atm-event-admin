@@ -13,7 +13,7 @@ import Results from "./views/Results";
 
 function App({ db, storage }) {
     return (
-        <BrowserRouter>
+        <BrowserRouter basename="/atm-event-admin">
             <Route
                 path="/"
                 render={({ location }) => (
