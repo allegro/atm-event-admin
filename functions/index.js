@@ -15,6 +15,46 @@ const logo = Buffer.from(logoBase64, 'base64');
 admin.initializeApp();
 
 /**
+ * Recalculates user scans, based on scans found in its sub-collection.
+ */
+exports.recalculateScans = functions.firestore.document('users/{userId}/scans/{scanId}').onWrite((change, ctx) => {
+    const userItem = admin.firestore().collection('users').doc(ctx.params.userId);
+    const userScans = userItem.collection('scans');
+
+    const firstDayTimestamp = 1569276000000;  // Tue Sep 24 2019 00:00:00 GMT+0200 (Central European Summer Time)
+    const secondDayTimestamp = 1569362400000; // Wed Sep 25 2019 00:00:00 GMT+0200 (Central European Summer Time)
+    const endDayTimestamp = 1569448800000;    // Thu Sep 26 2019 00:00:00 GMT+0200 (Central European Summer Time)
+
+    return userScans.get()
+
+        .then(scansSnapshot => {
+            const calculated = { entranceParty: false, entranceFirstDay: false, entranceSecondDay: false };
+
+            scansSnapshot.forEach(scan => {
+                const { mode, at } = scan.data();
+
+                if (mode === 'PARTY') {
+                    calculated.entranceParty = true;
+                }
+
+                if (mode === 'VALIDATE' && at > firstDayTimestamp) {
+                    if (at < secondDayTimestamp) {
+                        calculated.entranceFirstDay = true;
+                    } else if (at < endDayTimestamp) {
+                        calculated.entranceSecondDay = true;
+                    }
+                }
+            });
+
+            return calculated;
+        })
+
+        .then(calculated => {
+            return userItem.set(calculated, { merge: true });
+        });
+});
+
+/**
  * Takes the users vote and forwards it to a schedule item votes sub-collection.
  */
 exports.mapToScheduleVote = functions.firestore.document('users/{userId}/votes/{scheduleId}').onWrite((change, ctx) => {

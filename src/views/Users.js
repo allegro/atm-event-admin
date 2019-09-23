@@ -47,7 +47,7 @@ export default function Users({ users }) {
     if (loading) return <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%' }}/>;
     if (error) return <p>ERROR: {error.toString()}</p>;
     return [
-        <Typography key="title" variant="h5">Edit users</Typography>,
+        <Typography key="title" variant="h5">Users</Typography>,
         <UsersTable key="table" rows={usersSnapshot.docs} onRemove={handleRemove} onActivate={handleActivation}/>,
         <AddUserDialog key="add-user" open={open} onClose={handleClose} onSubmit={handleSubmit}/>,
         <Fab key="action" onClick={() => setOpen(true)} className={classes.fab} color="secondary"><AddIcon/></Fab>,
@@ -73,13 +73,29 @@ export default function Users({ users }) {
 
 function UsersTable({ rows, onRemove, onActivate }) {
     const classes = useStyles();
-    return (
-        <Paper className={classes.root}>
+
+    const stats = rows.reduce((acc, user) => {
+        const { entranceParty, entranceFirstDay, entranceSecondDay} = user.data();
+
+        acc.total += 1;
+        if (entranceParty) acc.party += 1;
+        if (entranceFirstDay) acc.first += 1;
+        if (entranceSecondDay) acc.second += 1;
+        return acc;
+    }, { total: 0, first: 0, second: 0, party: 0 });
+
+    return [
+        <Typography key="stats" variant="caption">
+            total: {stats.total}<br />
+            entrances: (1st day: {stats.first}, 2nd day: {stats.second}, party: {stats.party})
+        </Typography>,
+        <Paper key="data" className={classes.root}>
             <Table>
                 <TableHead>
                     <TableRow>
                         <TableCell component="th">Name</TableCell>
                         <TableCell component="th">Email</TableCell>
+                        <TableCell component="th">Scans</TableCell>
                         <TableCell component="th">Type</TableCell>
                         <TableCell component="th">Actions</TableCell>
                         <TableCell component="th" align="right">Active</TableCell>
@@ -92,6 +108,7 @@ function UsersTable({ rows, onRemove, onActivate }) {
                             <TableRow key={user.id}>
                                 <TableCell scope="row">{user.displayName}</TableCell>
                                 <TableCell scope="row">{user.email}</TableCell>
+                                <TableCell scope="row"><Scans {...user} /></TableCell>
                                 <TableCell scope="row">{user.type}</TableCell>
                                 <TableCell scope="row">
                                     <ComfirmableButton disabled={user.admin} onSubmit={() => onRemove(user)}
@@ -109,7 +126,38 @@ function UsersTable({ rows, onRemove, onActivate }) {
                 </TableBody>
             </Table>
         </Paper>
-    );
+    ];
+}
+
+const useScansStyles = makeStyles(theme => ({
+    scans: {
+        display: 'flex'
+    },
+    positiveItem: {
+        flex: '0 0 20px',
+        textAlign: 'center',
+        background: '#0f0',
+        margin: '0 1px',
+        fontSize: '10px',
+        lineHeight: '20px'
+    },
+    negativeItem: {
+        flex: '0 0 20px',
+        textAlign: 'center',
+        background: '#f00',
+        margin: '0 1px',
+        fontSize: '10px',
+        lineHeight: '20px'
+    }
+}));
+
+function Scans({ entranceParty = false, entranceFirstDay = false, entranceSecondDay = false }) {
+    const classes = useScansStyles();
+    return <div className={classes.scans}>
+        <span className={entranceFirstDay ? classes.positiveItem : classes.negativeItem}>D1</span>
+        <span className={entranceParty ? classes.positiveItem : classes.negativeItem}>P</span>
+        <span className={entranceSecondDay ? classes.positiveItem : classes.negativeItem}>D2</span>
+    </div>
 }
 
 function AddUserDialog({ open, onClose, onSubmit }) {

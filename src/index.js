@@ -16,6 +16,8 @@ firebase.initializeApp({
     storageBucket: "atm-voting.appspot.com"
 });
 
+window.firebase = firebase;
+
 ReactDOM.render([
     <CssBaseline key="css"/>,
     <App key="app" db={firebase.firestore()} storage={firebase.storage()}/>
