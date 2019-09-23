@@ -63,7 +63,7 @@ export default function Schedule({ slots, speakers }) {
         <SlotsTable key="table" rows={slotsSnapshot.docs} speakers={speakersSnapshot.docs} onEdit={handleEdit}
                     onRemove={handleRemove}/>,
         <EditSlotDialog key="edit-slot" slot={state.slot} open={state.open} onClose={handleClose}
-                        onUpdate={handleUpdate}/>,
+                        onUpdate={handleUpdate} speakers={speakersSnapshot.docs} />,
         <Fab key="action" onClick={() => setState((old) => ({ open: true, slot: {} }))} className={classes.fab}
              color="secondary"><AddIcon/></Fab>
     ];
@@ -77,12 +77,22 @@ export default function Schedule({ slots, speakers }) {
     }
 
     function handleUpdate(slot) {
-        slot.start = Date.parse(slot.start);
-        slot.end = Date.parse(slot.end);
+
+        const updateSlotData = {
+            start: Number.isInteger(slot.start) ? slot.start : Date.parse(slot.start),
+            end: Number.isInteger(slot.end) ? slot.end : Date.parse(slot.end),
+            title: slot.title,
+            type: slot.type,
+            content: slot.content,
+            order: slot.order
+        };
+
+        console.log({ slot, updateSlotData });
+
         if (slot.id) {
-            slots.doc(slot.id).set(slot);
+            slots.doc(slot.id).set(updateSlotData, { merge: true });
         } else {
-            slots.add(slot);
+            slots.add(updateSlotData);
         }
         setState((old) => ({ ...old, open: false }));
     }
@@ -128,7 +138,7 @@ function SlotsTable({ rows, speakers, onEdit, onRemove }) {
                                 <TableCell scope="row">{slot.order}</TableCell>
                                 <TableCell scope="row">{slot.title}</TableCell>
                                 <TableCell
-                                    scope="row">{renderSpeakers(slot.speakers)}</TableCell>
+                                    scope="row">{renderSpeakers(slot.speakers, speakers)}</TableCell>
                                 <TableCell>
                                     <IconButton onClick={() => onEdit(slot)}><EditIcon/></IconButton>
                                     <ComfirmableButton onSubmit={() => onRemove(slot)}
@@ -143,16 +153,9 @@ function SlotsTable({ rows, speakers, onEdit, onRemove }) {
             </Table>
         </Paper>
     );
-
-    function renderSpeakers(slotSpeakers) {
-        return slotSpeakers
-            .map(slotSpeaker => slotSpeaker.id)
-            .map(speakerId => speakers.find(it => it.id === speakerId))
-            .map(speaker => <SpeakerChip key={speaker.id} speaker={speaker.data()} style={{ marginRight: 10 }}/>);
-    }
 }
 
-function EditSlotDialog({ slot, open, onClose, onUpdate }) {
+function EditSlotDialog({ slot, open, onClose, onUpdate, speakers }) {
     const start = slot.start ? new Date(slot.start) : new Date();
     const end = slot.end ? new Date(slot.end) : new Date();
     return <Dialog open={open} onClose={onClose} fullWidth>
@@ -160,6 +163,8 @@ function EditSlotDialog({ slot, open, onClose, onUpdate }) {
         <DialogContent>
             <TextField margin="dense" label="title" type="text" fullWidth defaultValue={slot.title}
                        onChange={handleChange('title')}/>
+            <TextField margin="dense" label="content" type="text" fullWidth defaultValue={slot.content} multiline
+                       onChange={handleChange('content')}/>
             <TextField margin="dense" label="start" type="datetime-local" fullWidth
                        defaultValue={format(start, 'yyyy-MM-dd\'T\'HH:mm', { locale: pl })}
                        onChange={handleChange('start')}/>
@@ -176,8 +181,8 @@ function EditSlotDialog({ slot, open, onClose, onUpdate }) {
             </FormControl>
             <TextField margin="dense" label="order" type="number" fullWidth defaultValue={slot.order}
                        onChange={handleChange('order')} inputProps={{ min: 0 }}/>
-            <TextField margin="dense" label="speakers" type="text" fullWidth defaultValue={slot.speakers}
-                       onChange={handleChange('speakers')}/>
+
+            {renderSpeakers(slot.speakers, speakers)}
         </DialogContent>
         <DialogActions>
             <Button onClick={onClose} color="primary">Cancel</Button>
@@ -188,4 +193,11 @@ function EditSlotDialog({ slot, open, onClose, onUpdate }) {
     function handleChange(name) {
         return (event) => slot[name] = event.target.value
     }
+}
+
+function renderSpeakers(slotSpeakers = [], speakersDocs = []) {
+    return slotSpeakers
+        .map(slotSpeaker => slotSpeaker.id)
+        .map(speakerId => speakersDocs.find(it => it.id === speakerId))
+        .map(speaker => <SpeakerChip key={speaker.id} speaker={speaker.data()} style={{ marginRight: 10 }}/>);
 }
