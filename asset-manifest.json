@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/atm-event-admin/static/js/main.b72de130.chunk.js",
-    "main.js.map": "/atm-event-admin/static/js/main.b72de130.chunk.js.map",
+    "main.js": "/atm-event-admin/static/js/main.535584f8.chunk.js",
+    "main.js.map": "/atm-event-admin/static/js/main.535584f8.chunk.js.map",
     "runtime~main.js": "/atm-event-admin/static/js/runtime~main.935e9eab.js",
     "runtime~main.js.map": "/atm-event-admin/static/js/runtime~main.935e9eab.js.map",
     "static/js/2.edf43b8e.chunk.js": "/atm-event-admin/static/js/2.edf43b8e.chunk.js",
     "static/js/2.edf43b8e.chunk.js.map": "/atm-event-admin/static/js/2.edf43b8e.chunk.js.map",
     "index.html": "/atm-event-admin/index.html",
-    "precache-manifest.e74a22a3f3aa6889d8732c72eac7a583.js": "/atm-event-admin/precache-manifest.e74a22a3f3aa6889d8732c72eac7a583.js",
+    "precache-manifest.11a18b2ce259597ea4f6d06790bc6d3a.js": "/atm-event-admin/precache-manifest.11a18b2ce259597ea4f6d06790bc6d3a.js",
     "service-worker.js": "/atm-event-admin/service-worker.js"
   }
 }
