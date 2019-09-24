@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Switch, Route, Link, BrowserRouter } from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar/AppBar";
 import Tabs from "@material-ui/core/Tabs";
@@ -11,7 +11,28 @@ import Speakers from "./views/Speakers";
 import Schedule from "./views/Schedule";
 import Results from "./views/Results";
 
-function App({ db, storage }) {
+function App({ auth, db, storage }) {
+    const [isAdmin, setAdmin] = useState(false);
+
+    useEffect(() => {
+        auth.onAuthStateChanged(user => {
+            if (!user) return setAdmin(false);
+
+            db.collection('users').doc(user.uid).get().then(profile => {
+                if (profile.exists) {
+                    const { admin } = profile.data();
+                    setAdmin(!!admin);
+                } else {
+                    setAdmin(false);
+                }
+            })
+        });
+    }, []);
+
+    if (!isAdmin) {
+        return null;
+    }
+
     return (
         <BrowserRouter basename="/atm-event-admin">
             <Route

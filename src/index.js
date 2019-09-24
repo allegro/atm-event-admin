@@ -20,7 +20,7 @@ window.firebase = firebase;
 
 ReactDOM.render([
     <CssBaseline key="css"/>,
-    <App key="app" db={firebase.firestore()} storage={firebase.storage()}/>
+    <App key="app" auth={firebase.auth()} db={firebase.firestore()} storage={firebase.storage()}/>
 ], document.getElementById('root'));
 
 serviceWorker.unregister();
