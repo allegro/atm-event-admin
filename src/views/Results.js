@@ -91,7 +91,7 @@ export default function Schedule({ slots, speakers }) {
             <Typography key="title" variant="h5">Voting results</Typography>
 
             <Grid container spacing={10}>
-                <Grid item xs={6}>
+                <Grid item md={6} xs={12}>
                     <h4 className={classes.cardTitleWhite}>Regular Talks</h4>
                     <Paper className={classes.root}>
                         <Table className={classes.table} size="small">
@@ -108,7 +108,7 @@ export default function Schedule({ slots, speakers }) {
                                     regularTalks.map((talk, i) => (
                                         <TableRow key={talk.title}>
                                             <TableCell>{i + 1}</TableCell>
-                                            <TableCell>{`${talk.score || 0} (${talk.votesCount || 0})`}</TableCell>
+                                            <TableCell>{`${(talk.score || 0).toFixed(3)} (${talk.votesCount || 0})`}</TableCell>
                                             <TableCell>{talk.title}</TableCell>
                                             <TableCell>{renderSpeakers(talk.speakers || [])}</TableCell>
                                         </TableRow>
@@ -119,7 +119,7 @@ export default function Schedule({ slots, speakers }) {
                     </Paper>
                 </Grid>
 
-                <Grid item xs={6}>
+                <Grid item md={6} xs={12}>
                     <h4 className={classes.cardTitleWhite}>Lightning Talks</h4>
                     <Paper className={classes.root}>
                         <Table className={classes.table} size="small">
